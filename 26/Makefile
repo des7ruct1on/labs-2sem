@@ -13,6 +13,6 @@ debug:
 	$(CC) $(CFLAGS) -g $(SOURCES)
 	sudo $(DEBUG) $(FILEOUT)
 cmp:
-	$(CC) $(CFLAGS) $(SOURCES) -o %(FILEOUT)
+	$(CC) $(CFLAGS) $(SOURCES) -o $(FILEOUT)
 run:
 	./$(FILEOUT)
