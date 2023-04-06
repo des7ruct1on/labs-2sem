@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -std=c99 -Wall Werror
 DEBUG = gdb
-FILEOUT = tree.out
-SOURCES = mytree.c main.c
+FILEOUT = deck.out
+SOURCES = deck.c main.c
 
 all:
 	$(CC) $(CFLAGS) $(SOURCES)  -o $(FILEOUT)
@@ -13,6 +13,6 @@ debug:
 	$(CC) $(CFLAGS) -g $(SOURCES)
 	sudo $(DEBUG) $(FILEOUT)
 cmp:
-	$(CC) $(CFLAGS) $(SOURCES) -o %(FILEOUT)
+	$(CC) $(CFLAGS) $(SOURCES) -o $(FILEOUT)
 run:
 	./$(FILEOUT)

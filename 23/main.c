@@ -4,14 +4,30 @@
 #include <stdlib.h>
 #include "tree.h"
 
+void printMenu() { //функция меню
+    printf("\nВыберите действие и введите его номер\n");
+    printf("0) Выход\n");
+    printf("1) Создать корень дерева\n");
+    printf("2) Добавить узел\n");
+    printf("3) Удалить узел\n");
+    printf("4) Вывести номер уровня с максимальным количеством элементов\n");
+    printf("5) Распечатать дерево\n");
+    
+}
+
+int max(int a, int b) { //функция максимума
+    return a > b ? a : b;
+}
 
 
 int main()
 {
+        
     Tree* tree = NULL; //сначала дерево пустое
     int value; //значение элемента дерева
     int parentValue; //значение отца
     int choose = 1; //переменная для выбора
+    int attitude;
     while (choose) {
         printMenu(); //выводим меню
         value = 0; //обнуляем значение
@@ -20,6 +36,9 @@ int main()
         switch(choose) {
             case 0: //выход
                 choose = 0;
+                clearTree(tree);
+                free(tree);
+                break;
             case 1: //создание узла
                 printf("\nВведите значение элемента:\n");
                 scanf("%d", &value);
@@ -51,3 +70,4 @@ int main()
     }
     return 0;
 }
+

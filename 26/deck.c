@@ -6,7 +6,19 @@ void initialisation (deck* D) { //функция инициализации де
 }
 
 int empty (deck* D) { //функция опустошения дека
-    return D->size == 0; //задаем нулевой размер
+    if (D->size == 0) {
+        return -1;
+    }
+    elementDeck* tmp = D->back;
+    for (int i = D->size; i != 0; i--) {
+        elementDeck* next = tmp->next;
+        free(tmp);
+        tmp = next;
+    }
+    D->back = NULL;
+    D->front = NULL;
+    D->size = 0;
+
 }
 
 void pushFront (deck* D, int value) { //добавление спереди
@@ -52,6 +64,7 @@ int popFront (deck* D) {//взятие спереди
         D->first->prev = NULL; //обнуляем
     }
     D->size--; //уменьшаем размер
+    free(D->first);
     return value; //возвращаем значение
 }
 
@@ -68,6 +81,7 @@ int popBack(deck* D) { //взятие с конца
         D->last = D->last->prev;
         D->last->next = NULL; //обнуляем
     }
+    free(D->last);
     D->size--; //уменьшаем размер
     return value; //возвращаем значение
     

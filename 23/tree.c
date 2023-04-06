@@ -1,41 +1,32 @@
 #include "tree.h"
 
-
-int max(int a, int b) { //функция максимума
-    return a > b ? a : b;
-}
-
-void dfs(node* tree, int level, int* levels) { //поиск в глубину
-    if (tree == NULL) {
+void dfs(node* tree, int level, int** levels_ptr, int* size) { // поиск в глубину
+    if (tree == NULL) { // если дерево пустое
         return;
     }
-    levels[level]++;
-    dfs(tree->son, level + 1, levels);
-    dfs(tree->brother, level, levels);
+    if (level >= *size) { //динамическое выделение памяти под массив
+        *size = level + 1;
+        *levels_ptr = realloc(*levels_ptr, *size * sizeof(int));
+    }
+    (*levels_ptr)[level]++;
+    dfs(tree->son, level + 1, levels_ptr, size); // рекурсия
+    dfs(tree->brother, level, levels_ptr, size);
 }
 
-void maxVertices(Tree* tree) { //functin to calcucale the number of level with the max number of vertices
-    int levels[1000] = {0};  // Maximum tree depth assumed to be 1000
-    dfs(tree->root, 0, levels);
-    for (int i = 0; i < 1000; i++) {
-        if (levels[i] > maxSum) {
+void maxVertices(Tree* tree) { // функция поиска уровня с макс количеством вершин
+    int maxSum = 0; //макс сумма
+    int maxLevel = 0; //максимальный уровень
+    int size = 0; //размер массива
+    int* levels = NULL; //создаем массив глубины
+    dfs(tree->root, 0, &levels, &size);
+    for (int i = 0; i < size; i++) {
+        if (levels[i] > maxSum) { // поиск максимума
             maxSum = levels[i];
             maxLevel = i;
         }
     }
     printf("Уровень с максимальным количеством вершин: %d\n", maxLevel);
-}
-
-
-void printMenu() { //функция меню
-    printf("\nВыберите действие и введите его номер\n");
-    printf("0) Выход\n");
-    printf("1) Создать корень дерева\n");
-    printf("2) Добавить узел\n");
-    printf("3) Удалить узел\n");
-    printf("4) Вывести номер уровня с максимальным количеством элементов\n");
-    printf("5) Распечатать дерево\n");
-    
+    free(levels); // очищаем массив
 }
 treeNode* newNode (int value, node* parent) { //функция создания нового узла
     node* nodeTemp;
@@ -53,20 +44,18 @@ Tree* newTree (int value) { //создаем корень
     return tree;
 }
  
-node* searchTree (node* tree, int val) { // поиск в дереве
-    if (tree == NULL) {// если дерево пустое, то возвращаем значение tree
+node* searchTree(node* tree, int value) {
+    if (tree == NULL) {
+        return NULL;
+    }
+    if (tree->value == value) {
         return tree;
     }
-    if (tree->value == val) {//нашли значение, которое искали
-        return tree;
+    node* found = searchTree(tree->son, value);
+    if (found == NULL) {
+        found = searchTree(tree->brother, value);
     }
-    if (tree->son != NULL) {//если сын не нулевой, то рекурсивно вызываем функцию search tree от сына
-        return searchTree(tree->son, val);
-    }
-    if (tree->son == NULL) {//сын нулевой, значит проверяем его брата
-        return searchTree(tree->brother, val);
-    }
-    return tree;
+    return found;
 }
 
 void addNodeToTree(Tree* tree, int value, int parentValue) {//функция добавления вершины к узлу
@@ -100,14 +89,34 @@ void deleteNode (Tree* tree, int value) { //функция удаления ве
         nodeTemp->parent->son = nodeTemp->brother; // переход на брата
     } else {
         node* treeTemp = nodeTemp->parent->son;
-        while (treeTemp != nodeTemp) {
-            treeTemp = treeTemp->brother; //двигаемся по братьям
+        while (treeTemp->brother != nodeTemp) { // пока не найдем брата удаляемого узла
+            treeTemp = treeTemp->brother;
         }
-        treeTemp->brother = treeTemp->brother;
-        
+        treeTemp->brother = nodeTemp->brother; // убираем узел из списка братьев
     }
-    free(nodeTemp); //высвобождаем память
+    if (nodeTemp->brother != NULL) {
+        nodeTemp->brother->parent = nodeTemp->parent; // обновляем указатель на родителя у брата
+    }
+    free(nodeTemp); // очищаем удаляемый узел
 }
+void clearNode(node* tree) { // функция очистки вершины
+    if (tree == NULL) { // проверяем, что вершина не пустая
+        return;
+    }
+    clearNode(tree->son); // очищаем сыновей
+    clearNode(tree->brother); // очищаем братьев
+    free(tree); // освобождаем память
+}
+void clearTree(Tree* tree) { // функция очистки дерева
+    if (tree == NULL) { // проверяем, что дерево не пустое
+        return;
+    }
+    if (tree->root != NULL) { // проверяем, что корень дерева не пустой
+        clearNode(tree->root); // очищаем корень
+        tree->root = NULL; // присваиваем корню дерева значение NULL
+    }
+}
+
 
 void printTree(node* tree, int x) { //вывод дерева с парсированиемы
     if (tree == NULL) {
