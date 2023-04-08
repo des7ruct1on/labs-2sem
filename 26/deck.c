@@ -5,18 +5,18 @@ void initialisation (deck* D) { //функция инициализации де
     D->last = 0;
 }
 
-int empty (deck* D) { //функция опустошения дека
+void empty (deck* D) { //функция опустошения дека
     if (D->size == 0) {
-        return -1;
+        printf("Дек пуст!\n");
     }
-    elementDeck* tmp = D->back;
+    elementDeck* tmp = D->last;
     for (int i = D->size; i != 0; i--) {
         elementDeck* next = tmp->next;
         free(tmp);
         tmp = next;
     }
-    D->back = NULL;
-    D->front = NULL;
+    D->last = NULL;
+    D->first = NULL;
     D->size = 0;
 
 }
