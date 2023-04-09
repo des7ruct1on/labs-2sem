@@ -6,7 +6,7 @@ SOURCES = tree.c main.c
 
 all:
 	$(CC) $(CFLAGS) $(SOURCES)  -o $(FILEOUT)
-	./$(FILEOUT)
+
 clean:
 	rm -f *.out
 debug:
