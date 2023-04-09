@@ -27,7 +27,6 @@ int main()
     int value; //значение элемента дерева
     int parentValue; //значение отца
     int choose = 1; //переменная для выбора
-    int attitude;
     while (choose) {
         printMenu(); //выводим меню
         value = 0; //обнуляем значение
@@ -58,7 +57,6 @@ int main()
                 break;
             case 4: //подсчет уровня с макс значением вершин
                 maxVertices(tree);
-                attitude = 0;
                 break;
             case 5: //вывод дерева
                 printTree(tree->root, 0);

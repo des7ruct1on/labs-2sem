@@ -38,5 +38,7 @@ void maxVertices (Tree* root);
 
 void printLevel(treeNode* root, int level);
 
-void dfs(node* tree, int level, int* levels);
+void printTree(node* tree, int x);
+
+void dfs(node* tree, int level, int** levels_ptr, int* size);
 #endif
