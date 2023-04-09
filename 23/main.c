@@ -39,6 +39,10 @@ int main()
                 free(tree);
                 break;
             case 1: //создание узла
+                if (tree != NULL) {
+                    clearTree(tree);
+                    free(tree);
+                }
                 printf("\nВведите значение элемента:\n");
                 scanf("%d", &value);
                 tree = newTree(value);
@@ -46,7 +50,7 @@ int main()
             case 2: //добавление вершины
                 printf("\nВведите значение узла:\n");
                 scanf("%d", &value);
-                printf("\nВведите значение корня:\n");
+                printf("\nВведите значение вершины:\n");
                 scanf("%d", &parentValue);
                 addNodeToTree(tree, value, parentValue);
                 break;
