@@ -6,7 +6,6 @@ SOURCES = deck.c main.c
 
 all:
 	$(CC) $(CFLAGS) $(SOURCES)  -o $(FILEOUT)
-
 clean:
 	rm -f *.out
 debug:

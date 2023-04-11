@@ -1,28 +1,24 @@
 #include "deck.h"
-void initialisation (deck* D) { //функция инициализации дека
-    D->size = 0; //задаем нулевые параметры
-    D->first = 0;
-    D->last = 0;
-}
-
-void empty (deck* D) { //функция опустошения дека
-    if (D->size == 0) {
-        printf("Дек пуст!\n");
-    }
-    elementDeck* tmp = D->last;
-    for (int i = D->size; i != 0; i--) {
-        elementDeck* next = tmp->next;
-        free(tmp);
-        tmp = next;
-    }
-    D->last = NULL;
-    D->first = NULL;
+void initDeck(deck *D) {
     D->size = 0;
-
+    D->first = NULL;
+    D->last = NULL;
 }
 
-void pushFront (deck* D, int value) { //добавление спереди
-    elementDeck* tmp = (elementDeck*)malloc(sizeof(elementDeck)); //выделяем память на элемент
+int size(deck *D) { //функция, вычисляющая значение дека
+    return D->size;
+}
+
+
+bool empty(deck *D) {
+    if (D->size == 0) {
+        return true;
+    }
+    return false;
+}
+
+void pushFront(deck *D, int value) {
+    element *tmp = (element *) malloc(sizeof(element)); //выделяем память на элемент
     tmp->value = value;//передаем ему значение из аргумента функции
     tmp->prev = NULL; //так как добавили спереди, то перед ним пусто
     tmp->next = D->first; // следующий для нашего элемента это бывший первый
@@ -36,8 +32,8 @@ void pushFront (deck* D, int value) { //добавление спереди
     D->size++; //увеличиваем размер дека
 }
 
-void pushBack (deck* D, int value) { //добавление в конец
-    elementDeck* tmp = (elementDeck*)malloc(sizeof(elementDeck)); //выделяем память
+void pushBack(deck *D, int value) { //добавление в конец
+    element *tmp = (element *) malloc(sizeof(element)); //выделяем память
     tmp->value = value; //передаем значение
     tmp->next = NULL; //очевидно что след элемент - пустой
     tmp->prev = D->last; //указатель на предыдущий - последний элемент дека
@@ -50,79 +46,106 @@ void pushBack (deck* D, int value) { //добавление в конец
     }
     D->size++; //увеличиваем размер дека
 }
-int popFront (deck* D) {//взятие спереди
-    if (D->size == 0) { //проверка на пустоту дека
+
+int popFront(deck *D) {//взятие спереди
+    if (empty(D)) { //проверка на пустоту дека
         printf("Дек пустой!");
         return -1;
     }
-    int value = D->first->value; //значение = значение первого
-    if (D->first == D->last) { //если дек состоит из 1 элемента
-        D->first = NULL; //обнуляем
-        D->last = NULL;
-    } else { //если дек состоит хотя бы из 2 элементов
-        D->first = D->first->next;
-        D->first->prev = NULL; //обнуляем
-    }
+    element *tmp = D->first;
+    int value = tmp->value;
+    D->first = tmp->next;
+    if (D->size == 1) D->last = NULL;
+    free(tmp);
+    tmp = NULL;
     D->size--; //уменьшаем размер
+    return value; //возвращаем значение
+}
+
+
+int popBack(deck *D) { //взятие с конца
+    if (empty(D)) { //проверка на пустоту дека
+        printf("Дек пустой!");
+        return -1;
+    }
+    element *tmp = D->last;
+    int value = tmp->value;
+    D->last = tmp->prev;
+    if (D->size == 1) D->first = NULL;
+    free(tmp);
+    tmp = NULL;
+    D->size--; //уменьшаем размер
+    return value; //возвращаем значение
+
+}
+
+int topFront(deck *D) {
+    if (empty(D)) {
+        printf("Дек пуст!\n");
+        return 1;
+    }
+    return D->first->value;
+}
+
+int topBack(deck *D) {
+    if (empty(D)) {
+        printf("Дек пуст!\n");
+        return 1;
+    }
+    return D->last->value;
+}
+
+/*bool deleteDeck(deck* D) {
+    if (empty(D)) { // если дек пуст
+        return false;
+    }
+    element* tmp = D->first->next;
     free(D->first);
-    return value; //возвращаем значение
-}
-
-int popBack(deck* D) { //взятие с конца
-    if (D->size == 0) { //проверка на пустоту дека
-        printf("Дек пустой!");
-        return -1;
+    D->size--;
+    if (tmp == 0) {
+        D->first = D->last = tmp;
+        return true;
     }
-    int value = D->last->value; //значение = значение последнего
-    if (D->first == D->last) { //если в деке ток 1 элемент
-        D->first = NULL; //обнуляем
-        D->last = NULL;
-    } else { //если в деке хотя бы 2 элемента
-        D->last = D->last->prev;
-        D->last->next = NULL; //обнуляем
+    D->first = tmp;
+    D->first->prev = 0;
+    return deleteDeck(D);
+}
+ */
+void deleteDeck(deck *D) {
+    int i = 0;
+    element *tmp = D->first;
+    for (i = size(D); i > 0; i--) {
+        element *next = tmp->next;
+        free(tmp);
+        tmp = next;
     }
-    free(D->last);
-    D->size--; //уменьшаем размер
-    return value; //возвращаем значение
-    
+    free(D);
 }
 
-int top (deck* D) { //взятие значения элемента сверху дека
-    if (D->size == 0) { //если пуст
-        printf("Дек пустой!");
-        return -1;
-    } else {
-        return D->first->value;
+deck *cat(deck *D1, deck *D2) { //конкатенация дека
+    while (!empty(D2)) { //пока второй не пуст
+        pushBack(D1, popFront(D2)); //добавляем элемент второго
+    }
+    return D1;
+}
+
+void append(deck *D1, deck *D2) {//добавление 1-ого в конец второго
+    cat(D1, D2);
+    for (int i = 0; i < size(D2); i++) {
+        pushBack(D2, popFront(D2));
     }
 }
 
-int size (deck* D) { //функция, вычисляющая значение дека
-    return D->size;
-}
-
-void printDeck (deck* D) { //вывод дека
-    if (D->size == 0) { //если пустой
+void printDeck(deck *D) { //вывод дека
+    if (empty(D)) { //если пустой
         printf("\n Дек пустой! \n");
     } else {
         printf("\n ( "); //скобка для вида
-        elementDeck* tmp = D->first; //объявляем элемент, который будем выводить
+        element *tmp = D->first; //объявляем элемент, который будем выводить
         while (tmp) { //пока элемент существует в деке
             printf("%d ", tmp->value); //вывод
             tmp = tmp->next; //сдвигаем на следующий
         }
         printf(")\n"); //закрываем скобку
-    }
-}
-
-void cat(deck* D1, deck* D2) { //конкатенация дека
-    while (D2->size != 0) { //пока второй не пуст
-        pushBack(D1, popFront(D2)); //добавляем элемент второго
-    }
-}
-
-void append (deck* D1, deck* D2) {//добавление 1-ого в конец второго
-    cat(D1, D2);
-    for (int i = 0; i < size(D2); i++) {
-        pushBack(D2, popFront(D2));
     }
 }
