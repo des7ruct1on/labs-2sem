@@ -7,6 +7,7 @@ void dfs(node* tree, int level, int** levels_ptr, int* size) { // поиск в 
     if (level >= *size) { //динамическое выделение памяти под массив
         *size = level + 1;
         *levels_ptr = realloc(*levels_ptr, *size * sizeof(int));
+        (*levels_ptr)[level] = 0;
     }
     (*levels_ptr)[level]++;
     dfs(tree->son, level + 1, levels_ptr, size); // рекурсия
