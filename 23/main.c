@@ -48,6 +48,10 @@ int main()
                 tree = newTree(value);
                 break;
             case 2: //добавление вершины
+                if (tree == NULL) {
+			        printf("Ошибка! Корень не создан\t");
+			        break;
+		        }
                 printf("\nВведите значение узла:\n");
                 scanf("%d", &value);
                 printf("\nВведите значение вершины:\n");
