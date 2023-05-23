@@ -1,12 +1,11 @@
 CC = gcc
-CFLAGS = -std=c99 -Wall Werror
+CFLAGS = -std=c99 -Wall -Werror
 DEBUG = gdb
 FILEOUT = deck.out
 SOURCES = deck.c main.c
 
 all:
 	$(CC) $(CFLAGS) $(SOURCES)  -o $(FILEOUT)
-	./$(FILEOUT)
 clean:
 	rm -f *.out
 debug:

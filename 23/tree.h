@@ -4,14 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int sum = 0; //глобальные переменные для удобства
-int maxSum = 0;
-int maxLevel = 0;
-int attitude = 0;
-
-int max(int a, int b);
-
-void printMenu();
 
 typedef struct treeNode { //структура вершины
     int value; //значение
@@ -26,8 +18,6 @@ typedef struct Tree { //структура узла
     node *root;
 } Tree;
 
-int height(treeNode* tree);
-
 void maxVertices(Tree* tree);
 
 treeNode* newNode (int value, node* parent);
@@ -40,11 +30,15 @@ void addNodeToTree(Tree* tree, int value, int parentValue);
 
 void deleteNode (Tree* tree, int value);
 
-void printTree(node* tree, int x);
+void clearNode(node* tree);
+
+void clearTree(Tree* tree);
 
 void maxVertices (Tree* root);
 
 void printLevel(treeNode* root, int level);
 
-void dfs(node* tree, int level, int* levels);
+void printTree(node* tree, int x);
+
+void dfs(node* tree, int level, int** levels_ptr, int* size);
 #endif

@@ -3,31 +3,31 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-typedef struct elementDeck elementDeck;
-typedef struct deck deck;
+#include <stdbool.h>
+typedef struct element {
+    int value; //значение
+    struct element *next; //указ на след элемент
+    struct element *prev; //указ на пред элемент
+} element;
 
-struct elementDeck { //структура элемента из дека
-    int value; // значение
-    elementDeck* next; //указатель на след элемент
-    elementDeck* prev; //указатель на предыдущий элемент
-};
+typedef struct deck {
+    element *first; //первый элемент
+    element *last; //последний элемент
+    int size; //рамзер
+} deck;
 
-struct deck { //структура дека
-    int size; //размер
-    elementDeck* first; //первый элемент
-    elementDeck* last; //последний элемент
-};
-
-void initialisation(deck* D);
-int empty(deck* D);
-void pushFront(deck* D, int value);
-void pushBack(deck* D, int value);
-int popFront(deck* D);
-int popBack(deck* D);
-int top(deck* D);
-int size(deck* D);
-void printDeck(deck* D);
-void cat(deck* D1, deck* D2);
-void append(deck* D1, deck* D2);
+void initDeck(deck *D);
+int size(deck *D);
+bool empty(deck *D);
+void pushFront(deck *D, int value);
+void pushBack(deck *D, int value);
+int popFront(deck *D);
+int popBack(deck *D);
+int topFront(deck *D);
+int topBack(deck *D);
+void deleteDeck(deck *D);
+deck *cat(deck *D1, deck *D2);
+void append(deck *D1, deck *D2);
+void printDeck(deck *D);
 
 #endif
