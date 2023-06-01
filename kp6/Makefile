@@ -1,29 +1,37 @@
 CC = gcc
-CFLAGS = -std=c99 -Wall -Werror
-GLOBALS = src/abiturient.c src/table.c
+CFLAGS = -std=c99 -Wall -Werror 
+DEBUG = gdb
+FILEOUT = src/out/main.out
+MAIN_SOURCES = src/main.c
+GLOBALS_SOURCES = src/abiturient.c
+CONV_TXT = src/txtToBin.c
+CONV_BIN = src/binToTxt.c
+CONVOUT = src/out/conv.out
+GEN = src/dbgenerator.c
+GENOUT = src/out/db.out
 
-MAIN_SRC = src/main.c
-MAIN_OUT = main.out
-GEN_SRC = src/dbgenerator.c
-GEN_OUT = dbgen.out 
-CONV_SRC = src/generate.c
-CONV_OUT = gen.out 
-
-all: 
-	$(CC) $(CFLAGS) $(MAIN_SRC) -o $(MAIN_OUT) 
-	$(CC) $(CFLAGS) $(GEN_SRC) -o $(GEN_OUT) 
-	$(CC) $(CFLAGS) $(CONV_SRC) -o $(CONV_OUT) 
-
-generate: 
-	$(CC) $(CFLAGS) $(GEN_SRC) -o $(GEN_OUT) 
-
-convert: 
-	$(CC) $(CFLAGS) $(CONV_SRC) -o $(CONV_OUT) 
-
-debug: 
-	$(CC) -g $(CFLAGS) $(MAIN_SRC) -o $(MAIN_OUT) 
-	$(CC) -g $(CFLAGS) $(GEN_SRC) -o $(GEN_OUT) 
-	$(CC) -g $(CFLAGS) $(CONV_SRC) -o $(CONV_OUT) 
-
-clean: 
+all:
+	$(CC) $(CFLAGS) $(SOURCES)  -o $(FILEOUT)
+	$(CC) $(CFLAGS) $(CONV) -o $(CONVOUT)
+	$(CC) $(CFLAGS) $(GEN) -o $(GENOUT)
+clean:
 	rm -f *.out
+debug:
+	$(CC) -g $(CFLAGS) $(SOURCES)  -o $(FILEOUT)
+	$(CC) -g $(CFLAGS) $(CONV) -o $(CONVOUT)
+	$(CC) -g $(CFLAGS) $(GEN) -o $(GENOUT)
+cmp:
+	$(CC) $(CFLAGS) $(GLOBALS_SOURCES) $(MAIN_SOURCES) -o $(FILEOUT)
+main:
+	./$(FILEOUT) $(FILE)
+convertation:
+	./$(CONVOUT) $(FILE1) $(FILE2)
+generation:
+	./$(GENOUT) $(FILE) 
+converttxt:
+	$(CC) $(CFLAGS) $(GLOBALS_SOURCES) $(CONV_TXT) -o $(CONVOUT)
+convertbin:
+	$(CC) $(CFLAGS) $(GLOBALS_SOURCES) $(CONV_BIN) -o $(CONVOUT)
+
+generate:
+	$(CC) $(CFLAGS) $(GLOBALS_SOURCES) $(GEN) -o $(GENOUT)

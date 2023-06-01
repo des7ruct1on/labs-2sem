@@ -1,7 +1,6 @@
 #ifndef allowdata_h
 #define allowdata_h
 #include "abiturient.h"
-#include "table.h"
 
 char* allowedSurnamesMale[] = {
     "Zaitsev",

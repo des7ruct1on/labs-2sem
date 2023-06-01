@@ -5,12 +5,12 @@
 #include "../headers/abiturient.h"
 
 void printMenu() {
-    printf("\texit - выход\n");
-    printf("\tinfo - информация об абитуриенте(info [Фамилия] [Инициалы])\n");
-    printf("\tadd - добавление абитуриента(add [Фамилия] [Инициалы] [Пол] [Школа] [Медаль] [Зачет по сочинению], далее пары [Экзамен] [Балл])\n");
-    printf("\ttask - найти абитуриента-немедалистов с общим баллов выше среднего\n");
-    printf("\ttable - распечатать таблицу\n");
-    printf("\tremove - удаление абитуриента(remove [фамилия])\n");
+    printf("\t0)выход\n");
+    printf("\t1)информация об абитуриенте\n");
+    printf("\t2)добавление абитуриента\n");
+    printf("\t3)найти абитуриента-немедалистов с общим баллов выше среднего\n");
+    printf("\t4)удаление абитуриента\n");
+    printf("\t5)помощь с выбором команды\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Некорректное расширение файла!\n");
         exit(2);
     }
-    char line[STRSIZE];
+    char line[1000];
     HashTable* table = malloc(sizeof(HashTable));
     initHashTable(table);
     if(!isBinary) {
@@ -42,17 +42,13 @@ int main(int argc, char *argv[]) {
             perror("Ошибка, не удалось открыть файл");
             exit(1);
         }
-        while(fgets(line, STRSIZE, file) != NULL) {
+        while(fgets(line, 1000, file) != NULL) {
             abiturient* abit = newAbiturient();
-
-            readFromLine(abit, line);
+            //printf("%s\n", line);
+            csvRead(abit, line);
             char* surname = getSurname(abit);
-            char* initials = getInitials(abit);
-            char key[STRSIZE];
-            strcpy(key, surname); // Копируем фамилию в ключ
-            strcat(key, " "); // добавляем разделитель
-            strcat(key, initials); // Добавляем инициалы в конец ключа
-            insertElement(table, key, abit);
+
+            insertElement(table, surname, abit);
         }
     } else {
         file = fopen(filename, "rb");
@@ -62,87 +58,95 @@ int main(int argc, char *argv[]) {
         }
         while (true) {
             abiturient* abit = newAbiturient();
-            abiturientReadBin(abit, file);
-            char key[STRSIZE];
-            char* surname = getSurname(abit);
-            char* initials = getInitials(abit);     
-            strcpy(key, surname); // Копируем фамилию в ключ
-            strcat(key, " "); // добавляем разделитель
-            strcat(key, initials); // Добавляем инициалы в конец ключа
+            if (abiturientReadBin(abit, file) == 0) {
+                break;
+            }
 
-            insertElement(table, key, abit);
+            char* surname = getSurname(abit);
+
+            insertElement(table, surname, abit);
         }
     }
 
     char choose[STRSIZE];
     printf("Выберите действие\n");
     while(strcmp(choose, "exit") != 0) {
-        printMenu();
-        fgets(choose, sizeof(choose), stdin);
+        printAbiturientStr(table);
         int len = strlen(choose);
+        fgets(choose, sizeof(choose), stdin);
         if (choose[len - 1] == '\n') {
             choose[len - 1]= '\0';
         }
         char* cmd = strtok(choose, " ");
         if (cmd == NULL) {
             printf("Некорректная команда!\n");
-            break;
+            continue;
         }
         int lenCmd = strlen(cmd);
         char* arg = choose + lenCmd + 1;
-        if (strcmp(cmd, "add") == 0) {
+        if (strcmp(cmd, "help") == 0) {
+            printMenu();
+        } else if (strcmp(cmd, "add") == 0) {
             if (arg[0] == '\0') {
                 printf("Ошибка: добавьте имя\n");
                 continue;
             }
+            abiturient* abit;
             if (isBinary) {
-                addAbiturientBin(filename, arg, table);
+                abit = addAbiturientBin(filename, arg);
             } else {
-                addAbiturient(filename, arg, table);
+                abit = addAbiturient(filename, arg);
             }
+            if (abit == NULL) {
+                printf("Ошибка при попытке добавления!\n");
+                continue;
+            }
+            insertElement(table, getSurname(abit), abit);
         } else if (strcmp(cmd, "remove") == 0) {
             if (arg[0] == '\0') {
                 printf("Ошибка: добавьте имя\n");
-                break;
+                continue;
             }
             if (file != NULL) {
                 fclose(file);
             }
             if (isBinary) {
-                removeStudentBin(filename, arg, table);
+                removeStudentBin(filename, arg);
                 file = fopen(filename, "rb");
             } else {
-                removeStudent(filename, arg, table);
+                removeStudent(filename, arg);
                 file = fopen(filename, "r");
             }
             if (file == NULL) {
                 perror("Ошибка при работе с файлом");
                 exit(1);
             }
+            removeElement(table, arg);
  
         } else if (strcmp(cmd, "info") == 0) {
             if (arg[0] == '\0') {
-                printf("Ошибка! Добавьте имя абитуриента и инициалы\n");
+                printf("Ошибка! Добавьте имя абитуриента\n");
                 continue;
             }
             abiturient* find = findElement(table, arg);
             if (find == NULL) {
                 printf("Не удается найти абитуриента: %s\n", arg);
-                break;
+                continue;
             }
             printAbiturientChars(find);
         } else if (strcmp(cmd, "table") == 0) {
             printAbiturientStr(table);
         } else if (strcmp(cmd, "task") == 0) {
-            task(table);
+            printf("Неизвестная команда!\n");
         } else {
             printf("Неизвестная команда!\n");
         }
 
+
+        clearHashTable(table);
+        free(table);
+        fclose(file);
+        return 0;
     }
-    clearHashTable(table);
-    free(table);
-    fclose(file);
-    return 0;
 
 } 

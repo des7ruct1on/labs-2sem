@@ -4,15 +4,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "table.h"
-#define STRSIZE 24
+#include <string.h>
+#define STRSIZE 256
+#define TABLESIZE 100
 
 typedef int32_t Item;
 
-typedef struct {
-    char ob[20][STRSIZE];
-    Item ball[20];
-} subjectBall;
+
+typedef struct value{
+    char subject[STRSIZE];
+    int ball;
+} value;
+
+typedef struct node { //структура двусвязного списка
+    value data;
+    struct node* next;
+    struct node* prev;
+} node;
 
 typedef struct abiturient {
     char surname[STRSIZE];
@@ -21,28 +29,50 @@ typedef struct abiturient {
     Item schoolNum;
     char medal[STRSIZE];
     char composition[STRSIZE];
-    Item examBall;
-    subjectBall balls;
-    hashTable* chars;
+    node* examStats;
 } abiturient;
+
+typedef struct entry {
+    char key[STRSIZE];
+    abiturient* value;
+} Entry;
+
+typedef struct hashtable {
+    Entry entries[TABLESIZE];
+} HashTable;
+
+void pushFront(node** head, value data);
+void pushBack(node** head, value data);
+void deleteBack(node* head);
+void deleteFront(node* head);
+void printList(node* head);
+void destroy(node* head);
+int sizeList(node* head);
+
+void initHashTable(HashTable* table);
+unsigned int hash(const char* key);
+void insertElement(HashTable* table, const char* key, abiturient* value);
+abiturient* findElement(HashTable* table, const char* key);
+void removeElement(HashTable* table, const char* key);
+void clearHashTable(HashTable* table);
 
 char* getSurname(abiturient* s);
 char* getInitials(abiturient* s);
-abiturient* addAbiturient(const char* filename, char* in, hashTable* table);
-abiturient* addAbiturientBin(const char* filename, char* in, hashTable* table);
-int removeStudent(const char* file, const char* id); 
-int removeStudentBin(const char* file, const char* id);
 abiturient* newAbiturient();
-void* getTableChars(abiturient* s, const char* key);
-abiturient* addAbiturient(const char* filename, char* in, hashTable* table);
+void addAbiturient(const char* filename, char* in, HashTable* table);
+void addAbiturientBin(const char* filename, char* in, HashTable* table);
+void removeStudent(const char* file, const char* id, HashTable* table);
+void removeStudentBin(const char* file, const char* id, HashTable* table);
 void printAbiturientChars(abiturient* s);
 void abiturientFree(abiturient* s);
-int csvRead(abiturient* abit, char* in);
-void addReadAbitur(char* surname, char list[TABLESIZE][STRSIZE], int* count, hashTable* table);
-int abiturientReadTxt(abiturient *s, FILE *in);
-void abiturientWriteTxt(abiturient *s, FILE *file);
-int abiturientReadBin(abiturient *s, FILE *in);
-void abiturientWriteBin(abiturient *s, FILE *out);
+void printAbiturientStr(HashTable* table);
+void task(HashTable* table);
+
+void readFromLine(abiturient* s, char* line);
+int abiturientReadTxt(abiturient* s, FILE* in);
+void abiturientWriteTxt(abiturient* s, FILE* file);
+int abiturientReadBin(abiturient* s, FILE* in);
+void abiturientWriteBin(abiturient* s, FILE* out);
 
 
 #endif
