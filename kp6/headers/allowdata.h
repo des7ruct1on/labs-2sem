@@ -78,7 +78,7 @@ char* allowedSchoolNumber[] = {
 };
 char* allowedSubjects[] = {
     "Math",
-    "English",
+    "Eng",
     "Rus",
     "Bio",
     "Geo",

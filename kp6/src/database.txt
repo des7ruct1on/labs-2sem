@@ -1,32 +1,33 @@
-Baykasenova A.A Male 85 No No Rus 99 Geo 60 Phys 87 
-Zaitseva P.B Male 93 Yes Yes Rus 81 Inf 84 Social 93 
-Maksimov R.B Male 77 Yes No Rus 100 Phys 98 Social 85 
-Temniy A.Z Female 3 Yes No Rus 72 Phys 92 Inf 81 
-Zaitsev F.M Female 113 No Yes Rus 53 English 67 Bio 77 
-Temniya D.M Male 1577 Yes No Rus 92 English 76 Phys 76 
-Vasilyeva I.A Female 16 Yes No Rus 97 Phys 95 Geo 82 
-Maksimova P.B Female 347 No Yes Rus 68 Phys 65 Liter 56 
-Temniya N.N Male 2 Yes Yes Rus 86 Geo 88 Inf 96 
-Nikitina N.L Male 143 No Yes Rus 74 Social 78 Geo 67 
-Maksimov O.O Female 1577 No No Rus 71 Math 43 English 89 
-Vasilyeva A.A Female 2 No Yes Rus 45 Phys 71 Liter 74 
-Pozdniy R.B Female 143 Yes Yes Rus 85 Bio 79 Liter 100 
-Nadtochiy I.S Female 95 Yes Yes Rus 94 Social 77 Math 98 
-Nadtochiy N.N Female 95 Yes Yes Rus 90 Social 93 Phys 81 
-Gagarina I.S Female 3 No No Rus 85 Chem 64 Liter 46 
-Zaitsev O.B Female 3 Yes No Rus 75 Math 70 Bio 73 
-Alekseev U.S Male 143 No Yes Rus 46 Inf 78 Geo 100 
-Alekseeva V.V Male 143 No Yes Rus 80 Bio 62 Geo 72 
-Temniya R.B Female 3 No No Rus 73 English 95 Math 40 
-Nikitina R.B Female 2 Yes Yes Rus 81 Social 77 Math 88 
-Gagarina P.N Male 36 Yes Yes Rus 79 Phys 99 Bio 90 
-Alekseev O.B Male 152 No No Rus 95 Math 48 Liter 57 
-Vasilyeva U.S Female 77 No Yes Rus 96 Inf 52 Bio 61 
-Maksimov P.B Female 93 Yes Yes Rus 83 Math 76 Social 75 
-Nikitina O.B Male 1111 Yes Yes Rus 90 Inf 92 English 93 
-Temniy D.M Female 85 Yes Yes Rus 96 Liter 94 English 87 
-Maksimova L.A Male 102 Yes No Rus 79 Math 84 Phys 88 
-Nikitin P.B Female 102 No No Rus 99 English 64 Social 76 
-Vasilyev O.O Male 347 Yes No Rus 88 Social 82 Geo 73 
-Pozdniya N.N Male 93 Yes No Rus 98 Social 75 Geo 91 
-Temniya L.A Female 1111 No No Rus 41 Math 81 English 57 
+Baykasenova A.A Male 85 No No 3 Phys 87 Geos 60 Russ 99 
+Zaitseva P.B Male 93 Yes Yes 3 Social 93 Infial 84 Rusial 81 
+Maksimov R.B Male 77 Yes No 3 Social 85 Physal 98 Russal 100 
+Temniy A.Z Female 3 Yes No 3 Inf 81 Phys 92 Russ 72 
+Lyapin I.A Male 1577 No Yes 3 Phys 80 Math 84 Rush 86 
+Zaitsev F.M Female 113 No Yes 3 Bio 76 English 67 Ruslish 53 
+Temniya D.M Male 1577 Yes No 3 Phys 76 English 76 Ruslish 92 
+Vasilyeva I.A Female 16 Yes No 3 Geo 82 Phys 95 Russ 97 
+Maksimova P.B Female 347 No Yes 3 Liter 56 Physr 65 Russr 68 
+Temniya N.N Male 2 Yes Yes 3 Inf 96 Geo 88 Rus 86 
+Nikitina N.L Male 143 No Yes 3 Geo 67 Social 78 Rusial 74 
+Maksimov O.O Female 1577 No No 3 English 89 Mathish 43 Rushish 71 
+Vasilyeva A.A Female 2 No Yes 3 Liter 74 Physr 71 Russr 45 
+Pozdniy R.B Female 143 Yes Yes 3 Liter 100 Bioer 79 Ruser 85 
+Nadtochiy I.S Female 95 Yes Yes 3 Math 98 Social 77 Rusial 94 
+Nadtochiy N.N Female 95 Yes Yes 3 Phys 81 Social 93 Rusial 90 
+Gagarina I.S Female 3 No No 3 Liter 46 Chemr 64 Rusmr 85 
+Zaitsev O.B Female 3 Yes No 3 Bio 73 Math 70 Rush 75 
+Alekseev U.S Male 143 No Yes 3 Geo 100 Inf 78 Rus 46 
+Alekseeva V.V Male 143 No Yes 3 Geo 72 Bio 62 Rus 80 
+Temniya R.B Female 3 No No 3 Math 40 English 95 Ruslish 73 
+Nikitina R.B Female 2 Yes Yes 3 Math 88 Social 77 Rusial 81 
+Gagarina P.N Male 36 Yes Yes 3 Bio 90 Phys 99 Russ 79 
+Alekseev O.B Male 152 No No 3 Liter 57 Mathr 48 Rushr 95 
+Lyapina D.A Female 1577 No Yes 4 History 62 English 76 Soclish 62 Ruslish 92 
+Vasilyeva U.S Female 77 No Yes 3 Bio 61 Inf 52 Rus 96 
+Maksimov P.B Female 93 Yes Yes 3 Social 75 Mathal 76 Rushal 83 
+Nikitina O.B Male 1111 Yes Yes 3 English 93 Inflish 92 Ruslish 90 
+Temniy D.M Female 85 Yes Yes 3 English 87 Litersh 94 Rusersh 96 
+Maksimova L.A Male 102 Yes No 3 Phys 88 Math 84 Rush 79 
+Vasilyev O.O Male 347 Yes No 3 Geo 73 Social 82 Rusial 88 
+Pozdniya N.N Male 93 Yes No 3 Geo 91 Social 75 Rusial 98 
+Temniya L.A Female 1111 No No 3 English 57 Mathish 81 Rushish 41 

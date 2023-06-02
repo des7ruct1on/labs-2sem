@@ -4,8 +4,7 @@ DEBUG = gdb
 FILEOUT = src/out/main.out
 MAIN_SOURCES = src/main.c
 GLOBALS_SOURCES = src/abiturient.c
-CONV_TXT = src/txtToBin.c
-CONV_BIN = src/binToTxt.c
+CONV = src/convert.c
 CONVOUT = src/out/conv.out
 GEN = src/dbgenerator.c
 GENOUT = src/out/db.out
@@ -28,10 +27,7 @@ convertation:
 	./$(CONVOUT) $(FILE1) $(FILE2)
 generation:
 	./$(GENOUT) $(FILE) 
-converttxt:
-	$(CC) $(CFLAGS) $(GLOBALS_SOURCES) $(CONV_TXT) -o $(CONVOUT)
-convertbin:
-	$(CC) $(CFLAGS) $(GLOBALS_SOURCES) $(CONV_BIN) -o $(CONVOUT)
-
+convert:
+	$(CC) $(CFLAGS) $(GLOBALS_SOURCES) $(CONV) -o $(CONVOUT)
 generate:
 	$(CC) $(CFLAGS) $(GLOBALS_SOURCES) $(GEN) -o $(GENOUT)

@@ -50,6 +50,12 @@ void removeElement(HashTable* table, const char* key) {
 
     while (table->entries[index].value != NULL) {
         if (strcmp(table->entries[index].key, key) == 0) {
+            abiturient* removedValue = table->entries[index].value;
+
+            // Освободить память для удаленного элемента
+            abiturientFree(removedValue);
+
+            // Установить ключ и значение в NULL для удаленного элемента
             table->entries[index].key[0] = '\0';
             table->entries[index].value = NULL;
             return;
@@ -59,10 +65,14 @@ void removeElement(HashTable* table, const char* key) {
     }
 }
 
+
 void clearHashTable(HashTable* table) {
     for (int i = 0; i < TABLESIZE; i++) {
+        if (table->entries[i].value != NULL) {
+            abiturientFree(table->entries[i].value);
+            table->entries[i].value = NULL;
+        }
         table->entries[i].key[0] = '\0';
-        table->entries[i].value = NULL;
     }
 }
 
@@ -145,14 +155,17 @@ void printList(node* head) {
     printf("\n");
 }
 
-void destroy(node* head) {
-    node* current = head;
+void destroyList(node** head) {
+    node* current = *head;
+    node* next;
+
     while (current != NULL) {
-        node* temp = current;
-        current = current->next;
-        free(temp);
+        next = current->next;
+        free(current);
+        current = next;
     }
-    head = NULL;
+
+    *head = NULL;
 }
 
 int sizeList(node* head) {
@@ -189,7 +202,8 @@ abiturient* newAbiturient() {
     strcpy(s->initials, "");
     strcpy(s->medal, "");
     strcpy(s->sex, "");
-
+    s->numExams = 0;
+    s->schoolNum = 0;
     s->examStats = NULL;
 
     return s;
@@ -197,60 +211,34 @@ abiturient* newAbiturient() {
 
 
 void readFromLine(abiturient* s, char* line) {
-    char* token = strtok(line, " ");
-    
-    // Считываем первые 6 слов
-    strncpy(s->surname, token, STRSIZE - 1);
-    s->surname[STRSIZE - 1] = '\0';
-    token = strtok(NULL, " ");
-    
-    strncpy(s->initials, token, STRSIZE - 1);
-    s->initials[STRSIZE - 1] = '\0';
-    token = strtok(NULL, " ");
-    
-    strncpy(s->sex, token, STRSIZE - 1);
-    s->sex[STRSIZE - 1] = '\0';
-    token = strtok(NULL, " ");
-    
-    s->schoolNum = atoi(token);
-    token = strtok(NULL, " ");
-    
-    strncpy(s->medal, token, STRSIZE - 1);
-    s->medal[STRSIZE - 1] = '\0';
-    token = strtok(NULL, " ");
-    
-    strncpy(s->composition, token, STRSIZE - 1);
-    s->composition[STRSIZE - 1] = '\0';
-    token = strtok(NULL, " ");
-    
-    s->examStats = NULL;  // Инициализируем список результатов экзаменов
-    
-    node* current = s->examStats;  // Указатель на текущий элемент списка
-    
-    // Считываем пары слов (экзамен и балл) и добавляем их в список
-    while (token != NULL) {
-        value examResult;
-        strncpy(examResult.subject, token, STRSIZE - 1);
-        examResult.subject[STRSIZE - 1] = '\0';
-        token = strtok(NULL, " ");
-        
-        int ball = atoi(token);
-        token = strtok(NULL, " ");
-        
-        if (current == NULL) {
-            pushBack(&(s->examStats), examResult);
-            s->examStats->data.ball = ball;
-            current = s->examStats;
-        } else {
-            pushBack(&(current->next), examResult);
-            current->next->data.ball = ball;
-            current = current->next;
-        }
+    char subject[STRSIZE];
+    int ball;
+    int offset = 0;
+
+    sscanf(line, "%s %s %s %d %s %s %d%n", s->surname, s->initials, s->sex, &(s->schoolNum), s->medal, s->composition, &(s->numExams), &offset);
+    line += offset;
+    int num = s->numExams;
+
+    // Очищаем существующий список экзаменов
+    s->examStats = NULL;
+    for (int i = 0; i < num; i++) {
+        sscanf(line, "%s %d%n", subject, &ball, &offset);
+        value exam;
+        strcpy(exam.subject, subject);
+        exam.ball = ball;
+
+        // Добавляем новый узел в начало списка
+        pushFront(&(s->examStats), exam);
+
+        line += offset + 1;  // Учитываем пробел после каждого экзамена
     }
 }
 
+
+
+
 void addAbiturient(const char* filename, char* in, HashTable* table) {
-    FILE* newFile = fopen(filename, "a+"); //openning with a+ key to add to the end
+    FILE* newFile = fopen(filename, "a+"); 
     if (newFile == NULL) {
         perror("Error");
         exit(1);
@@ -284,87 +272,70 @@ void addAbiturient(const char* filename, char* in, HashTable* table) {
 void addAbiturientBin(const char* filename, char* in, HashTable* table) {
     FILE* file = fopen(filename, "ab");
     if (file == NULL) {
-        perror("Ошибка открытия файлы");
+        perror("Ошибка открытия файла");
         exit(1);
     }
+    
     abiturient* abit = newAbiturient();
-    abiturientReadBin(abit, file);
+    readFromLine(abit, in); // Преобразование строки в структуру abiturient
+    
     char* surname = getSurname(abit);
     char* initials = getInitials(abit);
     char key[STRSIZE];
     strcpy(key, surname); // Копируем фамилию в ключ
     strcat(key, " "); // добавляем разделитель
     strcat(key, initials); // Добавляем инициалы в конец ключа
-    abiturientWriteBin(abit, file);
+    
+    abiturientWriteBin(abit, file); // Запись абитуриента в бинарный файл
+    
     fclose(file);
+    
     printf("%s %s был добавлен в таблицу.\n", surname, initials);
     insertElement(table, key, abit);
 }
 
-void removeStudent(const char* file, const char* id, HashTable* table) {
-    FILE* tmpFile = tmpfile();
-    if (tmpFile == NULL) {
-        printf("Не удалось создать временный файл!\n");
-        exit(1);
-    }
 
+void removeStudent(const char* file, const char* id, HashTable* table) {
+    FILE* fp = fopen(file, "w");
+    if (fp == NULL) {
+        printf("Не удалось открыть файл.\n");
+        return;
+    }
+    
     removeElement(table, id);
-    for(int i = 0; i < TABLESIZE; i++) {
+    
+    // Перезаписываем оставшихся абитуриентов в файл
+    for (int i = 0; i < TABLESIZE; i++) {
         if (table->entries[i].value != NULL) {
             abiturient* tmp = table->entries[i].value;
-            abiturientWriteTxt(tmp, tmpFile);
+            abiturientWriteTxt(tmp, fp);
         }
     }
-
-    fseek(tmpFile, 0, SEEK_SET);
-
-    FILE* originalFile = fopen(file, "w");
-    if (originalFile == NULL) {
-        printf("Не удалось открыть файл для записи!\n");
-        exit(1);
-    }
-
-    char buffer[1024];
-    size_t bytesRead;
-    while ((bytesRead = fread(buffer, 1, sizeof(buffer), tmpFile)) > 0) {
-        fwrite(buffer, 1, bytesRead, originalFile);
-    }
-
-    fclose(originalFile);
+    
+    fclose(fp);
 }
 
 
 
+
 void removeStudentBin(const char* file, const char* id, HashTable* table) {
-    FILE* tmpFile = tmpfile();
-    if (tmpFile == NULL) {
-        printf("Не удалось создать временный файл!\n");
-        exit(1);
+    FILE* fp = fopen(file, "wb");
+    if (fp == NULL) {
+        printf("Не удалось открыть файл.\n");
+        return;
     }
 
     removeElement(table, id);
-    for(int i = 0; i < TABLESIZE; i++) {
+
+    // Перезаписываем оставшихся абитуриентов в файл
+    for (int i = 0; i < TABLESIZE; i++) {
         if (table->entries[i].value != NULL) {
             abiturient* tmp = table->entries[i].value;
-            abiturientWriteBin(tmp, tmpFile);
+            abiturientWriteBin(tmp, fp);
         }
     }
 
-    fseek(tmpFile, 0, SEEK_SET);
-
-    FILE* originalFile = fopen(file, "wb");
-    if (originalFile == NULL) {
-        printf("Не удалось открыть файл для записи!\n");
-        exit(1);
-    }
-
-    char buffer[1024];
-    size_t bytesRead;
-    while ((bytesRead = fread(buffer, 1, sizeof(buffer), tmpFile)) > 0) {
-        fwrite(buffer, 1, bytesRead, originalFile);
-    }
-    fclose(originalFile);
-    fclose(tmpFile);
+    fclose(fp);
 }
 
 
@@ -404,14 +375,21 @@ void abiturientFree(abiturient* s) {
     if (s == NULL) {
         return;
     }
-    free(s->surname);
-    free(s->initials);
-    free(s->sex);
-    s->schoolNum = 0;
-    free(s->medal);
-    free(s->composition);
-    destroy(s->examStats);
+
+    // Освободить память для связанного списка examStats
+    node* current = s->examStats;
+    node* next;
+
+    while (current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+
+    // После освобождения связанного списка, можно освободить саму структуру abiturient
+    free(s);
 }
+
 
 void printAbiturientStr(HashTable* table) {
     printf("| Фамилия | Инициалы | Пол | Номер школы | Наличие медали | Зачет по сочинению |\n");
@@ -428,42 +406,46 @@ void printAbiturientStr(HashTable* table) {
                 printf("| Экзамен %d: %s, балл - %d \n", (j+1), exam->data.subject, exam->data.ball);
                 exam = exam->next;
             }
-            printf("-----------------\n");
+            printf("-----------------------------------------------------------\n");
         }
     }
 }
 
 
+void writeStrBin(char *str, FILE *out) {
+    int lenght = strlen(str);
+    fwrite(&lenght, sizeof(int), 1, out);
+    fwrite(str, sizeof(char), lenght, out);
+}
+
+void readStrBin(char *str, FILE *in) {
+    int length;
+    fread(&length, sizeof(int), 1, in);
+    fread(str, sizeof(char), length, in);
+}
 
 int abiturientReadTxt(abiturient* s, FILE* in) {
-    fscanf(in, "%s", s->surname);
-    fscanf(in, "%s", s->initials);
-    fscanf(in, "%s", s->sex);
-    fscanf(in, "%d", &(s->schoolNum));
-    fscanf(in, "%s", s->medal);
-    fscanf(in, "%s", s->composition);
+    if (fscanf(in, "%s %s %s %d %s %s", s->surname, s->initials, s->sex, &(s->schoolNum), s->medal, s->composition) != 6)
+        return 0;
 
-    // Очищаем существующий список экзаменов
-    s->examStats = NULL;
+    if (fscanf(in, "%d", &(s->numExams)) != 1)
+        return 0;
 
-    int numExams = 0;
-    char subject[STRSIZE];
-    int ball;
-    while (fscanf(in, "%s %d", subject, &ball) == 2) {
+    for (int i = 0; i < s->numExams; i++) {
+        char subject[MAXSIZE];
+        int ball;
+
+        if (fscanf(in, "%s %d", subject, &ball) != 2)
+            return 0;
+
         value exam;
         strcpy(exam.subject, subject);
         exam.ball = ball;
-
-        // Добавляем новый узел в начало списка
-        pushFront(&(s->examStats), exam);
-
-        numExams++;
+        pushBack(&(s->examStats), exam);
     }
 
-    return numExams > 0;
+    return 1;
 }
-
-
 
 void abiturientWriteTxt(abiturient* s, FILE* file) {
     fprintf(file, "%s ", s->surname);
@@ -472,63 +454,67 @@ void abiturientWriteTxt(abiturient* s, FILE* file) {
     fprintf(file, "%d ", s->schoolNum);
     fprintf(file, "%s ", s->medal);
     fprintf(file, "%s ", s->composition);
-    
+
+    fprintf(file, "%d ", s->numExams);
+
     node* current = s->examStats;
     while (current != NULL) {
-        value exam = current->data;
-        fprintf(file, "%s %d ", exam.subject, exam.ball);
+        fprintf(file, "%s %d ", current->data.subject, current->data.ball);
         current = current->next;
     }
-    
+
     fprintf(file, "\n");
 }
 
-int abiturientReadBin(abiturient* s, FILE* in) {
-    fread(s->surname, sizeof(char), strlen(s->surname) + 1, in);
-    fread(s->initials, sizeof(char), strlen(s->initials) + 1, in);
-    fread(s->sex, sizeof(char), strlen(s->sex) + 1, in);
-    fread(&(s->schoolNum), sizeof(Item), 1, in);
-    fread(s->medal, sizeof(char), strlen(s->medal) + 1, in);
-    fread(s->composition, sizeof(char), strlen(s->composition) + 1, in);
-
-    // Очищаем существующий список экзаменов
-    destroy(s->examStats);
-    s->examStats = NULL;
-
-    int numExams = 0;
-    char subject[STRSIZE];
-    int ball;
-    while (fread(subject, sizeof(char), STRSIZE, in) == STRSIZE && fread(&ball, sizeof(int), 1, in) == 1) {
-        value exam;
-        strcpy(exam.subject, subject);
-        exam.ball = ball;
-
-        // Добавляем новый узел в начало списка
-        pushFront(&(s->examStats), exam);
-
-        numExams++;
-    }
-
-    return numExams > 0;
-}
-
-
 void abiturientWriteBin(abiturient* s, FILE* out) {
-    fwrite(s->surname, sizeof(char), STRSIZE, out);
-    fwrite(s->initials, sizeof(char), STRSIZE, out);
-    fwrite(s->sex, sizeof(char), STRSIZE, out);
+    // Записываем поля фиксированного размера
+    writeStrBin(s->surname, out);
+    writeStrBin(s->initials, out);
+    writeStrBin(s->sex, out);
     fwrite(&(s->schoolNum), sizeof(Item), 1, out);
-    fwrite(s->medal, sizeof(char), STRSIZE, out);
-    fwrite(s->composition, sizeof(char), STRSIZE, out);
+    writeStrBin(s->medal, out);
+    writeStrBin(s->composition, out);
 
+    // Записываем количество экзаменов
+    fwrite(&(s->numExams), sizeof(Item), 1, out);
+
+    // Записываем экзамены
     node* current = s->examStats;
     while (current != NULL) {
-        value exam = current->data;
-        fwrite(exam.subject, sizeof(char), STRSIZE, out);
-        fwrite(&(exam.ball), sizeof(int), 1, out);
+        writeStrBin(current->data.subject, out);
+        fwrite(&(current->data.ball), sizeof(int), 1, out);
         current = current->next;
     }
 }
+int abiturientReadBin(abiturient* s, FILE* in) {
+    readStrBin(s->surname, in);
+    readStrBin(s->initials, in);
+    readStrBin(s->sex, in);
+    if (fread(&(s->schoolNum), sizeof(Item), 1, in) != 1)
+        return 0;
+
+    readStrBin(s->medal, in);
+    readStrBin(s->composition, in);
+    if (fread(&(s->numExams), sizeof(Item), 1, in) != 1)
+        return 0;
+    int numExams = s->numExams;
+    for (int i = 0; i < numExams; i++) {
+        char subject[MAXSIZE];
+        int ball;
+
+        readStrBin(subject, in);
+        if (fread(&ball, sizeof(int), 1, in) != 1)
+            return 0;
+
+        value exam;
+        strcpy(exam.subject, subject);
+        exam.ball = ball;
+        pushBack(&(s->examStats), exam);
+    }
+
+    return 1;
+}
+
 
 void task(HashTable* table) {
     float totalBalls = 0;

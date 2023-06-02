@@ -7,7 +7,7 @@
 void printMenu() {
     printf("\texit - выход\n");
     printf("\tinfo - информация об абитуриенте(info [Фамилия] [Инициалы])\n");
-    printf("\tadd - добавление абитуриента(add [Фамилия] [Инициалы] [Пол] [Школа] [Медаль] [Зачет по сочинению], далее пары [Экзамен] [Балл])\n");
+    printf("\tadd - добавление абитуриента(add [Фамилия] [Инициалы] [Пол] [Школа] [Медаль] [Зачет по сочинению] [количество экзаменов], далее пары [Экзамен] [Балл])\n");
     printf("\ttask - найти абитуриента-немедалистов с общим баллов выше среднего\n");
     printf("\ttable - распечатать таблицу\n");
     printf("\tremove - удаление абитуриента(remove [фамилия])\n");
@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     bool isBinary = false;
     if (strcmp(ext, ".txt") == 0 || ext == NULL) {
         printf("Вы используете .txt файл для работы\n");
-    } else if (strcmp(ext, ".bin") == 0 || ext != NULL) {
+    } else if (strcmp(ext, ".bin") == 0) {
         isBinary = true;
         printf("Вы используете .bin файл для работы\n");
     } else {
@@ -44,7 +44,6 @@ int main(int argc, char *argv[]) {
         }
         while(fgets(line, STRSIZE, file) != NULL) {
             abiturient* abit = newAbiturient();
-
             readFromLine(abit, line);
             char* surname = getSurname(abit);
             char* initials = getInitials(abit);
@@ -60,20 +59,22 @@ int main(int argc, char *argv[]) {
             perror("Ошибка, не удалось открыть файл");
             exit(1);
         }
-        while (true) {
+        while (!feof(file)) {
             abiturient* abit = newAbiturient();
-            abiturientReadBin(abit, file);
+            if (!abiturientReadBin(abit, file)) {
+                abiturientFree(abit);
+                break;
+            }
             char key[STRSIZE];
             char* surname = getSurname(abit);
             char* initials = getInitials(abit);     
             strcpy(key, surname); // Копируем фамилию в ключ
             strcat(key, " "); // добавляем разделитель
             strcat(key, initials); // Добавляем инициалы в конец ключа
-
             insertElement(table, key, abit);
         }
     }
-
+    fclose(file);
     char choose[STRSIZE];
     printf("Выберите действие\n");
     while(strcmp(choose, "exit") != 0) {
@@ -105,15 +106,10 @@ int main(int argc, char *argv[]) {
                 printf("Ошибка: добавьте имя\n");
                 break;
             }
-            if (file != NULL) {
-                fclose(file);
-            }
             if (isBinary) {
                 removeStudentBin(filename, arg, table);
-                file = fopen(filename, "rb");
             } else {
                 removeStudent(filename, arg, table);
-                file = fopen(filename, "r");
             }
             if (file == NULL) {
                 perror("Ошибка при работе с файлом");
@@ -128,7 +124,7 @@ int main(int argc, char *argv[]) {
             abiturient* find = findElement(table, arg);
             if (find == NULL) {
                 printf("Не удается найти абитуриента: %s\n", arg);
-                break;
+                continue;
             }
             printAbiturientChars(find);
         } else if (strcmp(cmd, "table") == 0) {
@@ -136,13 +132,12 @@ int main(int argc, char *argv[]) {
         } else if (strcmp(cmd, "task") == 0) {
             task(table);
         } else {
-            printf("Неизвестная команда!\n");
+            continue;
         }
 
     }
     clearHashTable(table);
     free(table);
-    fclose(file);
     return 0;
 
 } 

@@ -46,9 +46,9 @@ int main(int argc, char *argv[]) {
             grade3 = 70 + rand() % (100 - 70 + 1);
         }
         
-        sprintf(record, "%s %s %s %s %s %s %s %d %s %d %s %d",          
+        sprintf(record, "%s %s %s %s %s %s %d %s %d %s %d %s %d",          
                 surname, initials, sex, schoolNumber,
-                hasMedal, hasComposition,
+                hasMedal, hasComposition, 3, 
                 subjectName1, grade1,
                 subjectName2, grade2, subjectName3, grade3);    //записываем в массив record
         fprintf(fp, "%s\n", record);   //записываем в файл построчно

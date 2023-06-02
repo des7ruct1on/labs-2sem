@@ -7,12 +7,13 @@
 #include <string.h>
 #define STRSIZE 256
 #define TABLESIZE 100
+#define MAXSIZE 24
 
-typedef int32_t Item;
+typedef int Item;
 
 
 typedef struct value{
-    char subject[STRSIZE];
+    char subject[MAXSIZE];
     int ball;
 } value;
 
@@ -23,12 +24,13 @@ typedef struct node { //структура двусвязного списка
 } node;
 
 typedef struct abiturient {
-    char surname[STRSIZE];
-    char initials[STRSIZE];
-    char sex[STRSIZE];
+    char surname[MAXSIZE];
+    char initials[MAXSIZE];
+    char sex[MAXSIZE];
     Item schoolNum;
-    char medal[STRSIZE];
-    char composition[STRSIZE];
+    char medal[MAXSIZE];
+    char composition[MAXSIZE];
+    Item numExams;
     node* examStats;
 } abiturient;
 
