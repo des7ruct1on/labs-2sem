@@ -230,7 +230,7 @@ void readFromLine(abiturient* s, char* line) {
         // Добавляем новый узел в начало списка
         pushFront(&(s->examStats), exam);
 
-        line += offset + 1;  // Учитываем пробел после каждого экзамена
+        line += offset;  // Учитываем пробел после каждого экзамена
     }
 }
 
@@ -412,16 +412,35 @@ void printAbiturientStr(HashTable* table) {
 }
 
 
-void writeStrBin(char *str, FILE *out) {
-    int lenght = strlen(str);
-    fwrite(&lenght, sizeof(int), 1, out);
-    fwrite(str, sizeof(char), lenght, out);
+void writeStrBin(const char* str, FILE* out) {
+    int length = strlen(str);
+    if (length > MAXSIZE - 1) {
+        length = MAXSIZE - 1;  // Ограничиваем длину строки
+    }
+    fwrite(&length, sizeof(int), 1, out);
+    fwrite(str, sizeof(char), length, out);
+    char nullChar = '\0';
+    fwrite(&nullChar, sizeof(char), 1, out);  // Записываем нулевой символ в конце строки
 }
 
-void readStrBin(char *str, FILE *in) {
+int readStrBin(char* str, FILE* in) {
     int length;
-    fread(&length, sizeof(int), 1, in);
-    fread(str, sizeof(char), length, in);
+    if (fread(&length, sizeof(int), 1, in) != 1) {
+        *str = '\0';  // В случае ошибки чтения, устанавливаем пустую строку
+        return 0;     // Возвращаем 0, чтобы указать на ошибку чтения
+    }
+    if (length > MAXSIZE - 1) {
+        length = MAXSIZE - 1;  // Ограничиваем длину строки
+    }
+    if (length > 0) {
+        if (fread(str, sizeof(char), length, in) != length) {
+            *str = '\0';  // В случае ошибки чтения, устанавливаем пустую строку
+            return 0;     // Возвращаем 0, чтобы указать на ошибку чтения
+        }
+    }
+    str[length] = '\0';  // Добавляем нулевой символ в конце строки
+    fseek(in, 1, SEEK_CUR);  // Пропускаем нулевой символ
+    return 1;  // Возвращаем 1, чтобы указать на успешное чтение
 }
 
 int abiturientReadTxt(abiturient* s, FILE* in) {
@@ -487,22 +506,28 @@ void abiturientWriteBin(abiturient* s, FILE* out) {
     }
 }
 int abiturientReadBin(abiturient* s, FILE* in) {
-    readStrBin(s->surname, in);
-    readStrBin(s->initials, in);
-    readStrBin(s->sex, in);
+    if (!readStrBin(s->surname, in))
+        return 0;
+    if (!readStrBin(s->initials, in))
+        return 0;
+    if (!readStrBin(s->sex, in))
+        return 0;
     if (fread(&(s->schoolNum), sizeof(Item), 1, in) != 1)
         return 0;
-
-    readStrBin(s->medal, in);
-    readStrBin(s->composition, in);
+    if (!readStrBin(s->medal, in))
+        return 0;
+    if (!readStrBin(s->composition, in))
+        return 0;
     if (fread(&(s->numExams), sizeof(Item), 1, in) != 1)
         return 0;
+
     int numExams = s->numExams;
-    for (int i = 0; i < numExams; i++) {
+    for (int i = 0; i < numExams; ++i) {
         char subject[MAXSIZE];
         int ball;
 
-        readStrBin(subject, in);
+        if (!readStrBin(subject, in))
+            return 0;
         if (fread(&ball, sizeof(int), 1, in) != 1)
             return 0;
 
@@ -511,9 +536,9 @@ int abiturientReadBin(abiturient* s, FILE* in) {
         exam.ball = ball;
         pushBack(&(s->examStats), exam);
     }
-
     return 1;
 }
+
 
 
 void task(HashTable* table) {

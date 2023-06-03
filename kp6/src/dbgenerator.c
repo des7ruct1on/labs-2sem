@@ -8,14 +8,15 @@
 
 int main(int argc, char *argv[]) {
     srand(time(NULL));  // инициализируем для рандомного заполнения
-    int num;
-    printf("Enter the number of records: ");
-    scanf("%d", &num);
-    FILE* fp = fopen("database.txt", "w");  // открываем файл для записи
-
-
+    int num = atoi(argv[2]);
+    FILE* fp = fopen(argv[1], "w");  // открываем файл для записи
+    if (argc != 3) {
+        printf("Используйте: /generate FILE.txt [количество раз]\n");
+        return 1;
+    }
+    printf("%d", num);
     for (int i = 0; i < num; i++) {
-        char record[num / 2];  // буффер для хранения
+        char record[256];  // буффер для хранения
 
         char* surname;
         if (rand() % 2 == 0) {

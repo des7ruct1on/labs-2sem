@@ -55,13 +55,12 @@ int main(int argc, char* argv[]) {
         }
 
 
-        while (true) {
+        while (!feof(in)) {
             abiturient* student = newAbiturient();
             if(!abiturientReadBin(student, in)) {
                 abiturientFree(student);
                 break;
             }
-            printAbiturientChars(student);
             abiturientWriteTxt(student, out);
             abiturientFree(student);
         }

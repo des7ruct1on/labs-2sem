@@ -10,11 +10,11 @@ GEN = src/dbgenerator.c
 GENOUT = src/out/db.out
 
 all:
-	$(CC) $(CFLAGS) $(SOURCES)  -o $(FILEOUT)
-	$(CC) $(CFLAGS) $(CONV) -o $(CONVOUT)
-	$(CC) $(CFLAGS) $(GEN) -o $(GENOUT)
+	$(CC) $(CFLAGS) $(GLOBALS_SOURCES) $(MAIN_SOURCES)  -o $(FILEOUT)
+	$(CC) $(CFLAGS) $(GLOBALS_SOURCES) $(CONV) -o $(CONVOUT)
+	$(CC) $(CFLAGS) $(GLOBALS_SOURCES) $(GEN) -o $(GENOUT)
 clean:
-	rm -f *.out
+	rm -f src/out/*.out
 debug:
 	$(CC) -g $(CFLAGS) $(SOURCES)  -o $(FILEOUT)
 	$(CC) -g $(CFLAGS) $(CONV) -o $(CONVOUT)
@@ -26,7 +26,7 @@ main:
 convertation:
 	./$(CONVOUT) $(FILE1) $(FILE2)
 generation:
-	./$(GENOUT) $(FILE) 
+	./$(GENOUT) $(FILE) $(COUNT)
 convert:
 	$(CC) $(CFLAGS) $(GLOBALS_SOURCES) $(CONV) -o $(CONVOUT)
 generate:
