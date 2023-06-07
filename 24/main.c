@@ -157,48 +157,33 @@ void simplifyFraction(Tree* node) {
     if (node == NULL)
         return;
 
-    simplifyFraction(node->left);
-    simplifyFraction(node->right);
+    simplifyFraction(node->left);// рекурсовно упрощаем числитель
+    simplifyFraction(node->right);//упрощаем знаменатель
 
     if (node->value.type == symb_OP && node->value.data.op == OP_DIVIDE) {
         Tree* numerator = node->left;
         Tree* denominator = node->right;
-
-        if (numerator != NULL && denominator != NULL) {
-            simplifyFraction(numerator);  // Упрощаем числитель
-            simplifyFraction(denominator);  // Упрощаем знаменатель
-
-            if (denominator->value.type == symb_OP && denominator->value.data.op == OP_DIVIDE) {
-                Tree* num1 = numerator;
-                Tree* num2 = denominator->left;
-                Tree* den = denominator->right;
-
-                if (num1 != NULL && num2 != NULL && den != NULL) {
-                    Tree* newNumerator = malloc(sizeof(Tree));
-                    newNumerator->value = num1->value;
-                    newNumerator->parent = NULL;
-                    newNumerator->left = NULL;
-                    newNumerator->right = NULL;
-
-                    Tree* newDenominator = malloc(sizeof(Tree));
-                    newDenominator->value = num2->value;
-                    newDenominator->parent = NULL;
-                    newDenominator->left = NULL;
-                    newDenominator->right = NULL;
-
-                    Tree* simplifiedFraction = malloc(sizeof(Tree));
-                    simplifiedFraction->value.type = symb_OP;
-                    simplifiedFraction->value.data.op = OP_DIVIDE;
-                    simplifiedFraction->parent = NULL;
-                    simplifiedFraction->left = newNumerator;
-                    simplifiedFraction->right = newDenominator;
-
-                    node->left = simplifiedFraction;
-                    node->right = den;
-                    node->value.data.op = OP_MULTIPLY;
-                }
-            }
+        if (denominator->value.data.op == OP_DIVIDE && numerator->value.data.op != OP_DIVIDE) { //обрабатываем случай деления справа
+            node->value.data.op = OP_MULTIPLY;
+            node->right = denominator->right;
+            node->left = denominator;
+            denominator->right = denominator->left;
+            denominator->left = numerator;
+        } else if (numerator->value.data.op == OP_DIVIDE && denominator->value.data.op != OP_DIVIDE) { //обрабатываем случай деления слева
+            node->right = numerator;
+            node->left = denominator;
+            node->left = numerator->left;
+            numerator->left = denominator;
+            node->right->value.data.op = OP_MULTIPLY;
+        } else if (denominator->value.data.op == OP_DIVIDE && numerator->value.data.op == OP_DIVIDE) { //обрабатываем общий случай
+            numerator->value.data.op = OP_MULTIPLY;
+            denominator->value.data.op = OP_MULTIPLY;
+            Tree* rightRight = denominator->right;
+            Tree* leftRight = numerator->right;
+            denominator->right = leftRight;
+            numerator->right = rightRight;
         }
+
     }
 }
 
@@ -223,6 +208,7 @@ void treeToPostfix(Tree* node, char postfixExp[]) {
         strcat(postfixExp, " ");
     }
 }
+
 void treeToExpresion(Tree* tree) {
     switch (tree->value.type) {
         case symb_NUMBER:
