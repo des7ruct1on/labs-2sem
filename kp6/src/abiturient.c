@@ -238,6 +238,19 @@ void readFromLine(abiturient* s, char* line) {
 
 
 void addAbiturient(const char* filename, char* in, HashTable* table) {
+    abiturient* s = newAbiturient();
+    readFromLine(s, in);
+    char* surname = getSurname(s);
+    char* initials = getInitials(s);
+    char key[STRSIZE];
+    strcpy(key, surname); // Копируем фамилию в ключ
+    strcat(key, " "); // добавляем разделитель
+    strcat(key, initials); // Добавляем инициалы в конец ключа
+    if (isAbiturientExists(table, key)) {
+        printf("Абитуриент уже существует в базе данных\n");
+        abiturientFree(s);
+        return;
+    }
     FILE* newFile = fopen(filename, "a+"); 
     if (newFile == NULL) {
         perror("Error");
@@ -254,15 +267,6 @@ void addAbiturient(const char* filename, char* in, HashTable* table) {
         rewind(newFile);
         fprintf(newFile, "\n%s", in);
     }
-
-    abiturient* s = newAbiturient();
-    readFromLine(s, in);
-    char* surname = getSurname(s);
-    char* initials = getInitials(s);
-    char key[STRSIZE];
-    strcpy(key, surname); // Копируем фамилию в ключ
-    strcat(key, " "); // добавляем разделитель
-    strcat(key, initials); // Добавляем инициалы в конец ключа
     printf("%s", key);
     fclose(newFile);
     printf("%s %s был добавлен в таблицу.\n", surname, initials);
@@ -270,12 +274,6 @@ void addAbiturient(const char* filename, char* in, HashTable* table) {
 }
 
 void addAbiturientBin(const char* filename, char* in, HashTable* table) {
-    FILE* file = fopen(filename, "ab");
-    if (file == NULL) {
-        perror("Ошибка открытия файла");
-        exit(1);
-    }
-    
     abiturient* abit = newAbiturient();
     readFromLine(abit, in); // Преобразование строки в структуру abiturient
     
@@ -285,7 +283,16 @@ void addAbiturientBin(const char* filename, char* in, HashTable* table) {
     strcpy(key, surname); // Копируем фамилию в ключ
     strcat(key, " "); // добавляем разделитель
     strcat(key, initials); // Добавляем инициалы в конец ключа
-    
+    if (isAbiturientExists(table, key)) {
+        printf("Абитуриент уже существует в базе данных\n");
+        abiturientFree(abit);
+        return;
+    }
+    FILE* file = fopen(filename, "ab");
+    if (file == NULL) {
+        perror("Ошибка открытия файла");
+        exit(1);
+    }
     abiturientWriteBin(abit, file); // Запись абитуриента в бинарный файл
     
     fclose(file);
@@ -296,6 +303,10 @@ void addAbiturientBin(const char* filename, char* in, HashTable* table) {
 
 
 void removeStudent(const char* file, const char* id, HashTable* table) {
+    if(!isAbiturientExists(table, id)) {
+        printf("Абитуриент не найден в базе данных\n");
+        return;
+    }
     FILE* fp = fopen(file, "w");
     if (fp == NULL) {
         printf("Не удалось открыть файл.\n");
@@ -319,6 +330,10 @@ void removeStudent(const char* file, const char* id, HashTable* table) {
 
 
 void removeStudentBin(const char* file, const char* id, HashTable* table) {
+    if(!isAbiturientExists(table, id)) {
+        printf("Абитуриент не найден в базе данных\n");
+        return;
+    }
     FILE* fp = fopen(file, "wb");
     if (fp == NULL) {
         printf("Не удалось открыть файл.\n");
@@ -583,4 +598,8 @@ void task(HashTable* table) {
             }
         }
     }
+}
+
+bool isAbiturientExists(HashTable* table, const char* key) {
+    return findElement(table, key) != NULL;
 }

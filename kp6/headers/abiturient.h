@@ -68,6 +68,7 @@ void removeStudentBin(const char* file, const char* id, HashTable* table);
 void printAbiturientChars(abiturient* s);
 void abiturientFree(abiturient* s);
 void printAbiturientStr(HashTable* table);
+bool isAbiturientExists(HashTable* table, const char* key);
 void task(HashTable* table);
 
 void readFromLine(abiturient* s, char* line);
