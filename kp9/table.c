@@ -163,14 +163,3 @@ void vectorReverse(vector* a, vector* b) { //функция записи рев�
         pos++;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
