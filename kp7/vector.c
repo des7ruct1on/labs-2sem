@@ -35,9 +35,10 @@ void resizeVector(vector* v, int size) {//функция изменения ра
     int* new_values = (int*)realloc(v->value, size * sizeof(int));
     v->value = new_values;
     v->size = size;
-    for (int i = v->size; i < size; i++) {
+    /*for (int i = v->size; i < size; i++) {
         v->value[i] = 0;
     }
+    */
 }
 
 bool equal(vector* l, vector* r) {//функция проверки на равенство двух векторов
